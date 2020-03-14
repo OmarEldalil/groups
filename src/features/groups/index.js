@@ -1,12 +1,13 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {TouchableHighlight} from 'react-native';
-import {Icon} from 'react-native-material-ui';
+import Icon from 'react-native-vector-icons/AntDesign';
 
 import GroupsHome from './Home';
 import GroupDetail from './Details';
 import AddLesson from './AddLesson';
 import AddGroup from './AddGroup';
+import mainStyles from '../../../util/mainStyles';
 
 const GroupsStack = createStackNavigator();
 
@@ -24,18 +25,13 @@ const GroupsTab = () => {
                             onPress={() => {
                                 navigation.navigate('AddGroup');
                             }}
-                            style={{marginRight: 20}}
-                            underlayColor={'white'}
-                            activeOpacity={0.5}
+                            style={mainStyles.headerRightIconContainer}
+                            underlayColor={'#b9b9b9'}
+                            activeOpacity={0.2}
                         >
                             <Icon
-                                name={'add'}
-                                style={{
-                                    backgroundColor: '#e91e63',
-                                    color: 'white',
-                                    fontSize: 35,
-                                    borderRadius: 50,
-                                }}
+                                name={'pluscircle'}
+                                style={mainStyles.headerRightIcon}
                             />
                         </TouchableHighlight>
                     ),

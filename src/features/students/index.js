@@ -3,16 +3,53 @@ import {createStackNavigator} from '@react-navigation/stack';
 
 import StudentsHome from './Home';
 import StudentDetail from './Details';
+import {TouchableHighlight} from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
+import mainStyles from '../../../util/mainStyles';
+import AddStudent from './AddStudent';
+
 
 const StudentsStack = createStackNavigator();
 
-const StudentsTab = ()=>{
+const StudentsTab = () => {
     return (
         <StudentsStack.Navigator>
-            <StudentsStack.Screen name="StudentsHome" component={StudentsHome} />
-            <StudentsStack.Screen name="StudentDetail" component={StudentDetail} />
+            <StudentsStack.Screen
+                name="StudentsHome"
+                component={StudentsHome}
+                options={({route, navigation}) => ({
+                    title: 'All Students',
+                    headerRight: () => (
+                        <TouchableHighlight
+                            style={mainStyles.headerRightIconContainer}
+                            onPress={()=>{
+                                navigation.navigate('AddStudent')
+                            }}
+                        >
+                            <Icon
+                                name="pluscircle"
+                                style={mainStyles.headerRightIcon}/>
+                        </TouchableHighlight>
+                    ),
+                })}
+            />
+            <StudentsStack.Screen
+                name="StudentDetail"
+                component={StudentDetail}
+                options={({route}) => ({
+                    title: route.params.student.name,
+                })}
+            />
+
+            <StudentsStack.Screen
+                name="AddStudent"
+                component={AddStudent}
+                options={(route)=>({
+                    title: 'Add Student'
+                })}
+            />
         </StudentsStack.Navigator>
     );
 };
 
-export default StudentsTab
+export default StudentsTab;

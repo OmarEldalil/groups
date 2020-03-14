@@ -1,18 +1,11 @@
 import React from 'react';
-import {View, Text, TextInput, KeyboardAvoidingView, Picker, StyleSheet, Dimensions, ScrollView} from 'react-native';
+import {View, Text, TextInput, KeyboardAvoidingView, Picker, ScrollView} from 'react-native';
 import NumberInput from '../../../components/NumberInput';
+import mainStyles from '../../../util/mainStyles';
 
 import {getGradeUsers, getGroups} from './api';
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-const styles = StyleSheet.create({
-    label: {
-        fontWeight: 'bold',
-        fontSize: 20,
-        color: '#e91e63',
-    },
-});
 
 class AddGroup extends React.Component {
     state = {
@@ -81,7 +74,7 @@ class AddGroup extends React.Component {
             <ScrollView style={{marginTop: 10, marginHorizontal: 5}}>
                 <KeyboardAvoidingView behavior="padding">
                     {/* WeekDay selection*/}
-                    <Text style={styles.label}>Select A Day</Text>
+                    <Text style={mainStyles.label}>Select A Day</Text>
                     <Picker
                         selectedValue={this.state.day}
                         onValueChange={(itemValue, itemIndex) =>
@@ -93,9 +86,9 @@ class AddGroup extends React.Component {
                     </Picker>
 
                     {/* Time selection*/}
-                    <Text style={styles.label}>Select Time</Text>
+                    <Text style={mainStyles.label}>Select Time</Text>
                     <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <NumberInput style={{flex: 1.7}}
+                        <NumberInput style={{...mainStyles.textInput, flex: 1.7}}
                                      keyboardType="number-pad"
                                      placeholder="Hour from 0 to 12"
                                      maxLength={2}
@@ -109,7 +102,7 @@ class AddGroup extends React.Component {
                                          setImmediate(this.handleTimeSelection);
                                      }}
                         />
-                        <NumberInput style={{flex: 2}}
+                        <NumberInput style={{...mainStyles.textInput, marginLeft: 5, flex: 2}}
                                      keyboardType="number-pad"
                                      placeholder="Minutes from 0 to 59"
                                      maxLength={2}
@@ -136,8 +129,9 @@ class AddGroup extends React.Component {
                     </View>
 
                     {/* Academic Field*/}
-                    <Text style={styles.label}>Academic Year</Text>
+                    <Text style={mainStyles.label}>Academic Year</Text>
                     <TextInput
+                        style={mainStyles.textInput}
                         placeholder={'Academic Year'}
                         keyboardType="number-pad"
                         onChangeText={(val) => {
@@ -147,7 +141,7 @@ class AddGroup extends React.Component {
                     />
 
                     {/* Semester Field*/}
-                    <Text style={styles.label}>Semester</Text>
+                    <Text style={mainStyles.label}>Semester</Text>
                     <Picker
                         selectedValue={this.state.semester}
                         onValueChange={(itemValue, itemIndex) =>
@@ -158,7 +152,7 @@ class AddGroup extends React.Component {
                     </Picker>
 
                     {/* Grade Field*/}
-                    <Text style={styles.label}>Grade</Text>
+                    <Text style={mainStyles.label}>Grade</Text>
                     <Picker
                         selectedValue={this.state.grade}
                         onValueChange={(itemValue, itemIndex) => this.handleGradeChangeAndGetItsStudents(itemValue, itemIndex)}>
@@ -168,12 +162,16 @@ class AddGroup extends React.Component {
                     </Picker>
 
                     {/* Academic Field*/}
-                    <Text style={styles.label}>Students</Text>
-                    {(!this.state.students.length) ? (<Text>No Students</Text>) : (
-                        this.state.students.map((student, index) => (
-                            <Text key={index}>{student.name}</Text>
-                        ))
-                    )}
+                    <Text style={mainStyles.label}>Students</Text>
+                    {(!this.state.students.length) ? (
+                            <View style={mainStyles.center}>
+                                <Text>No Students</Text>
+                            </View>) :
+                        (
+                            this.state.students.map((student, index) => (
+                                <Text key={index}>{student.name}</Text>
+                            ))
+                        )}
                 </KeyboardAvoidingView>
             </ScrollView>
         );

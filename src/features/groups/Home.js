@@ -1,14 +1,10 @@
 import React from 'react';
 import {Text, View, StyleSheet, FlatList, TouchableHighlight} from 'react-native';
-import {Card} from 'react-native-material-ui';
 
 import {getGroups} from './api';
+import mainStyles from '../../../util/mainStyles';
 
 const styles = StyleSheet.create({
-    card: {
-        paddingHorizontal: 20,
-        paddingVertical: 10,
-    },
     title: {
         fontSize: 15,
         fontWeight: 'bold',
@@ -23,11 +19,13 @@ export default class GroupsHome extends React.Component {
         error: '',
     };
 
-    async componentDidMount() {
-        this._isMounted = true;
+    fetchGroups = async () => {
         try {
             let groups = await getGroups();
             if (this._isMounted) {
+                if (this.state.error) {
+                    this.setState({error: ''});
+                }
                 this.setState({groups: [...groups]});
             }
         } catch (e) {
@@ -39,6 +37,17 @@ export default class GroupsHome extends React.Component {
                 this.setState({loadingGroups: false});
             }
         }
+
+    };
+
+    async componentDidMount() {
+        this._isMounted = true;
+        this.props.navigation.addListener('focus', () => {
+            if (this.state.error || !this.state.groups.length) {
+                this.setState({loadingGroups: true});
+                this.fetchGroups();
+            }
+        });
     }
 
     componentWillUnmount() {
@@ -52,40 +61,39 @@ export default class GroupsHome extends React.Component {
     render() {
         if (this.state.loadingGroups) {
             return (
-                <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                <View style={mainStyles.center}>
                     <Text>Loading...</Text>
                 </View>
             );
         }
-        let content;
-
-        if (this.state.error) {
-            content = (
+        return (this.state.error) ? (
+            <View style={mainStyles.center}>
                 <Text style={{color: 'red'}}>{this.state.error}</Text>
-            );
-        } else {
-            content = (!this.state.groups.length) ? (<Text>No Groups Yet.</Text>) : (
-                <FlatList
-                    data={this.state.groups}
-                    renderItem={({item, index, separator}) => (
-                        <Card fullWidth onPress={() => this.getDetails({
-                            title: `${item.day.name} ${item.time.forHumans}`,
-                            groupDetails: item,
-                        })}
-                              key={item._id}>
-                            <View style={styles.card}>
+            </View>
+        ) : (!this.state.groups.length) ? (
+            <View style={mainStyles.center}>
+                <Text>No Groups Yet.</Text>
+            </View>
+        ) : (
+            <FlatList
+                data={this.state.groups}
+                renderItem={({item, index, separator}) => (
+                    <View key={item._id}>
+                        <TouchableHighlight style={mainStyles.card}
+                                            onPress={() => this.getDetails({
+                                                title: `${item.day.name} ${item.time.forHumans}`,
+                                                groupDetails: item,
+                                            })}
+                                            underlayColor={'#b9b9b9'}
+                        >
+                            <View>
                                 <Text style={styles.title}>{item.day.name} {item.time.forHumans}</Text>
                                 <Text>{item.grade} ({item.students.length}) Student</Text>
                             </View>
-                        </Card>
-                    )}
-                />
-            );
-        }
-        return (
-            <View style={{flex: 1}}>
-                {content}
-            </View>
+                        </TouchableHighlight>
+                    </View>
+                )}
+            />
         );
     }
 }

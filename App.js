@@ -6,8 +6,7 @@ import DashboardTab from './src/features/dashboard';
 import GroupsTab from './src/features/groups';
 import StudentsTab from './src/features/students';
 import MessagesTab from './src/features/messages';
-import {Icon} from 'react-native-material-ui';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 const TabNavigation = createBottomTabNavigator();
@@ -29,7 +28,7 @@ class App extends React.Component {
                         options={{
                             tabBarLabel: 'Dashboard',
                             tabBarIcon: ({color, size}) => (
-                                <Icon name="dashboard" size={size} color={color} />
+                                <Icon name="view-dashboard" size={size} color={color} />
                             ),
                         }}
                     />
@@ -39,7 +38,7 @@ class App extends React.Component {
                         options={{
                             tabBarLabel: 'Groups',
                             tabBarIcon: ({color, size}) => (
-                                <MaterialCommunityIcons name="google-classroom" size={size} color={color} />
+                                <Icon name="google-classroom" size={size} color={color} />
                             ),
                         }}
                     />
@@ -49,7 +48,7 @@ class App extends React.Component {
                          options={{
                             tabBarLabel: 'Students',
                             tabBarIcon: ({color, size}) => (
-                                <Icon name="group" size={size} color={color} />
+                                <Icon name="account-multiple" size={size} color={color} />
                             ),
                         }}
                     />
@@ -59,7 +58,7 @@ class App extends React.Component {
                          options={{
                             tabBarLabel: 'Messages',
                             tabBarIcon: ({color, size}) => (
-                                <Icon name="message" size={size} color={color} />
+                                <Icon name="comment-text-outline" size={size} color={color} />
                             ),
                         }}
                     />
