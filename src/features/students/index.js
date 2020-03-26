@@ -22,8 +22,8 @@ const StudentsTab = () => {
                     headerRight: () => (
                         <TouchableHighlight
                             style={mainStyles.headerRightIconContainer}
-                            onPress={()=>{
-                                navigation.navigate('AddStudent')
+                            onPress={() => {
+                                navigation.navigate('AddStudent');
                             }}
                         >
                             <Icon
@@ -44,8 +44,8 @@ const StudentsTab = () => {
             <StudentsStack.Screen
                 name="AddStudent"
                 component={AddStudent}
-                options={(route)=>({
-                    title: 'Add Student'
+                options={(route) => ({
+                    title: 'Add Student',
                 })}
             />
         </StudentsStack.Navigator>

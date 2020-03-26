@@ -12,54 +12,48 @@ const styles = StyleSheet.create({
 });
 
 export default class GroupsHome extends React.Component {
-    _isMounted = false;
     state = {
-        loadingGroups: true,
+        loading: true,
         groups: [],
         error: '',
     };
 
+    listener = null;
+
     fetchGroups = async () => {
+        this.setState({loading: true});
         try {
             let groups = await getGroups();
-            if (this._isMounted) {
-                if (this.state.error) {
-                    this.setState({error: ''});
-                }
-                this.setState({groups: [...groups]});
-            }
+            this.setState({groups: [...groups]});
         } catch (e) {
-            if (this._isMounted) {
-                this.setState({error: e.message});
-            }
+            this.setState({error: e.message});
         } finally {
-            if (this._isMounted) {
-                this.setState({loadingGroups: false});
-            }
+            this.setState({loading: false});
         }
 
     };
 
     async componentDidMount() {
-        this._isMounted = true;
-        this.props.navigation.addListener('focus', () => {
-            if (this.state.error || !this.state.groups.length) {
-                this.setState({loadingGroups: true});
-                this.fetchGroups();
+        await this.fetchGroups();
+        this.listener = this.props.navigation.addListener('focus', async () => {
+            let params = this.props.route.params;
+            if (typeof params !== 'undefined' && params.shouldAddGroup) {
+                params.shouldAddGroup = false;
+                await this.fetchGroups();
             }
         });
     }
 
     componentWillUnmount() {
-        this._isMounted = false;
+        this.props.navigation.removeListener(this.listener);
     }
 
-    getDetails(group) {
-        this.props.navigation.navigate('GroupDetail', {...group});
+    getDetails({group, title}) {
+        this.props.navigation.navigate('GroupDetails', {title, groupId: group._id});
     }
 
     render() {
-        if (this.state.loadingGroups) {
+        if (this.state.loading) {
             return (
                 <View style={mainStyles.center}>
                     <Text>Loading...</Text>
@@ -78,21 +72,28 @@ export default class GroupsHome extends React.Component {
             <FlatList
                 data={this.state.groups}
                 renderItem={({item, index, separator}) => (
-                    <View key={item._id}>
-                        <TouchableHighlight style={mainStyles.card}
-                                            onPress={() => this.getDetails({
-                                                title: `${item.day.name} ${item.time.forHumans}`,
-                                                groupDetails: item,
-                                            })}
-                                            underlayColor={'#b9b9b9'}
-                        >
-                            <View>
+                    <TouchableHighlight
+                        style={{...mainStyles.card, paddingHorizontal: 20}}
+                        onPress={() => this.getDetails({
+                            title: `${item.day.name} ${item.time.forHumans}`,
+                            group: item,
+                        })}
+                        underlayColor={'#b9b9b9'}
+                    >
+                        <View key={item._id} style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+                            <View style={{flex: 2}}>
                                 <Text style={styles.title}>{item.day.name} {item.time.forHumans}</Text>
                                 <Text>{item.grade} ({item.students.length}) Student</Text>
                             </View>
-                        </TouchableHighlight>
-                    </View>
+                            <View style={{flex: 1.2, alignItems: 'flex-start'}}>
+                                <Text
+                                    style={{fontSize: 14}}>{(item.semester === 1) ? 'First' : 'Second'} Term/{item.academicYear}</Text>
+                            </View>
+                        </View>
+                    </TouchableHighlight>
+
                 )}
+                keyExtractor={(item, index) => index.toString()}
             />
         );
     }

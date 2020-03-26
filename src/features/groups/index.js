@@ -1,13 +1,15 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
-import {TouchableHighlight} from 'react-native';
+import {TouchableHighlight, View} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 
 import GroupsHome from './Home';
-import GroupDetail from './Details';
-import AddLesson from './AddLesson';
+import GroupDetails from './Details';
+import AddSession from './AddSession';
 import AddGroup from './AddGroup';
-import mainStyles from '../../../util/mainStyles';
+import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
+import AddMoreStudents from './AddMoreStudents';
+import AddPayment from './AddPayment';
 
 const GroupsStack = createStackNavigator();
 
@@ -38,23 +40,38 @@ const GroupsTab = () => {
                 })}
             />
             <GroupsStack.Screen
-                name="GroupDetail"
-                component={GroupDetail}
-                options={({route}) => ({
+                name="GroupDetails"
+                component={GroupDetails}
+                options={({route, navigation}) => ({
                     title: route.params.title,
-                    // headerStyle: {
-                    //     backgroundColor: '#f4511e',
-                    // },
-                    // headerTintColor: '#fff',
-                    // headerTitleStyle: {
-                    //     fontWeight: 'bold',
-                    // },
-                })
-                }
+                })}
+
 
             />
-            <GroupsStack.Screen name="AddLesson" component={AddLesson} options={{title: 'Add New Lesson'}}/>
-            <GroupsStack.Screen name="AddGroup" component={AddGroup} options={{title: 'Add New Group'}}/>
+            <GroupsStack.Screen
+                name="AddSession"
+                component={AddSession}
+                options={({route, navigation}) => ({
+                    title: 'Add Session',
+                })}
+            />
+            <GroupsStack.Screen
+                name="AddMoreStudents"
+                component={AddMoreStudents}
+                options={({route, navigation}) => ({
+                    title: 'Add More Students',
+                })}
+            />
+            <GroupsStack.Screen
+                name="AddGroup"
+                component={AddGroup}
+                options={{title: 'Add New Group'}}
+            />
+            <GroupsStack.Screen
+                name="AddPayment"
+                component={AddPayment}
+                options={{title: 'Pay'}}
+            />
         </GroupsStack.Navigator>
     );
 };

@@ -4,6 +4,8 @@ import {Formik} from 'formik';
 import * as Yup from 'yup';
 
 import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
+import {createStudent} from './api';
+import ButtonCenter from '../../../components/ButtonCenter';
 
 class AddStudent extends React.Component {
     studentSchema = Yup.object().shape({
@@ -27,73 +29,93 @@ class AddStudent extends React.Component {
         return (
             <ScrollView>
                 <KeyboardAvoidingView>
-                <Formik
-                    initialValues={this.state.student}
-                    validationSchema={this.studentSchema}
-                    onSubmit={(values, errors) => {
-                        console.log(values);
-                    }}
-                >
-                    {({handleChange, handleBlur, handleSubmit, values, errors}) => (
-                        <View>
-                            <View style={mainStyles.textInputWrapper}>
-                                <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
-                                    <Text style={mainStyles.label}>Name </Text>
-                                    <Text style={{marginTop: 5, color: mainColorTheme, fontSize: 9}}>*</Text>
+                    <Formik
+                        initialValues={this.state.student}
+                        validationSchema={this.studentSchema}
+                        onSubmit={async (values) => {
+                            try {
+                                await createStudent(values);
+                                this.props.navigation.navigate('StudentsHome', {
+                                    shouldAddStudent: true,
+                                });
+                            } catch (e) {
+                                console.log(e);
+                            }
+                        }}
+                    >
+                        {({handleChange, handleBlur, handleSubmit, values, errors}) => (
+                            <View>
+                                <View style={mainStyles.textInputWrapper}>
+                                    <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
+                                        <Text style={mainStyles.label}>Name </Text>
+                                        <Text style={{marginTop: 5, color: mainColorTheme, fontSize: 9}}>*</Text>
+                                    </View>
+                                    <TextInput
+                                        style={{...mainStyles.textInput}}
+                                        placeholder={'Enter Student\'s Name'}
+                                        onChangeText={handleChange('name')}
+                                        onBlur={handleBlur('name')}
+                                        value={values.name}
+                                    />
+                                    {(errors.name) ? (<View style={mainStyles.center}>
+                                        <Text style={mainStyles.error}>{errors.name}</Text>
+                                    </View>) : <Text></Text>}
                                 </View>
-                                <TextInput
-                                    style={{...mainStyles.textInput}}
-                                    placeholder={'Enter Student\'s Name'}
-                                    onChangeText={handleChange('name')}
-                                    onBlur={handleBlur('name')}
-                                    value={values.name}
-                                />
-                            </View>
-                            <View style={mainStyles.textInputWrapper}>
-                                <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
-                                    <Text style={mainStyles.label}>Phone </Text>
-                                    <Text style={{marginTop: 5, color: mainColorTheme, fontSize: 9}}>*</Text>
+                                <View style={mainStyles.textInputWrapper}>
+                                    <View style={{flexDirection: 'row', alignItems: 'flex-start'}}>
+                                        <Text style={mainStyles.label}>Phone </Text>
+                                        <Text style={{marginTop: 5, color: mainColorTheme, fontSize: 9}}>*</Text>
+                                    </View>
+                                    <TextInput
+                                        style={{...mainStyles.textInput}}
+                                        keyboardType="numeric"
+                                        placeholder={'Enter Student\'s Phone'}
+                                        onChangeText={handleChange('phone')}
+                                        onBlur={handleBlur('phone')}
+                                        value={values.phone}
+                                    />
+                                    {(errors.phone) ? (<View style={mainStyles.center}>
+                                        <Text style={mainStyles.error}>{errors.phone}</Text>
+                                    </View>) : <Text></Text>}
                                 </View>
-                                <TextInput
-                                    style={{...mainStyles.textInput}}
-                                    keyboardType="numeric"
-                                    placeholder={'Enter Student\'s Phone'}
-                                    onChangeText={handleChange('phone')}
-                                    onBlur={handleBlur('phone')}
-                                    value={values.phone}
+
+                                <View style={mainStyles.textInputWrapper}>
+                                    <Text style={mainStyles.label}>Password</Text>
+                                    <TextInput
+                                        style={{...mainStyles.textInput}}
+                                        secureTextEntry={true}
+                                        autoCorrect={false}
+                                        placeholder={'Enter Student\'s Password'}
+                                        onChangeText={handleChange('password')}
+                                        onBlur={handleBlur('password')}
+                                        value={values.password}
+                                    />
+                                    {(errors.password) ? (<View style={mainStyles.center}>
+                                        <Text style={mainStyles.error}>{errors.password}</Text>
+                                    </View>) : <Text></Text>}
+                                </View>
+
+                                <View style={mainStyles.textInputWrapper}>
+                                    <Text style={mainStyles.label}>Grade</Text>
+                                    <Picker
+                                        selectedValue={values.grade}
+                                        onValueChange={handleChange('grade')}>
+                                        <Picker.Item label="First Year" value="1" key="1"/>
+                                        <Picker.Item label="Second Year" value="2" key="2"/>
+                                        <Picker.Item label="Third Year" value="3" key="3"/>
+                                    </Picker>
+                                    {(errors.grade) ? (<View style={mainStyles.center}>
+                                        <Text style={mainStyles.error}>{errors.grade}</Text>
+                                    </View>) : <Text></Text>}
+                                </View>
+                                <ButtonCenter
+                                    onPress={handleSubmit}
+                                    title="Add"
+                                    iconName="plus"
                                 />
                             </View>
-
-                            <View style={mainStyles.textInputWrapper}>
-                                <Text style={mainStyles.label}>Password</Text>
-                                <TextInput
-                                    style={{...mainStyles.textInput}}
-                                    secureTextEntry={true}
-                                    autoCorrect={false}
-                                    placeholder={'Enter Student\'s Password'}
-                                    onChangeText={handleChange('password')}
-                                    onBlur={handleBlur('password')}
-                                    value={values.password}
-                                />
-                            </View>
-
-                            <View style={mainStyles.textInputWrapper}>
-                                <Text style={mainStyles.label}>Grade</Text>
-                                <Picker
-                                    selectedValue={values.grade}
-                                    onValueChange={handleChange('grade')}>
-                                    <Picker.Item label="First Year" value="1" key="1"/>
-                                    <Picker.Item label="Second Year" value="2" key="2"/>
-                                    <Picker.Item label="Third Year" value="3" key="3"/>
-                                </Picker>
-                            </View>
-
-                            <View style={mainStyles.textInputWrapper}>
-                                < Button color={mainColorTheme} onPress={handleSubmit} title='Add'/>
-                            </View>
-                        </View>
-                    )}
-                </Formik>
+                        )}
+                    </Formik>
                 </KeyboardAvoidingView>
             </ScrollView>
         );

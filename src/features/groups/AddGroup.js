@@ -1,41 +1,91 @@
 import React from 'react';
-import {View, Text, TextInput, KeyboardAvoidingView, Picker, ScrollView} from 'react-native';
-import NumberInput from '../../../components/NumberInput';
-import mainStyles from '../../../util/mainStyles';
+import {View, Text, TextInput, KeyboardAvoidingView, Picker, ScrollView, Button} from 'react-native';
+import {CheckBox} from 'react-native-elements';
+import * as Yup from 'yup';
 
-import {getGradeUsers, getGroups} from './api';
+import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
+import {feesPerMonth} from '../../../app.json';
+import {createGroup, getGradeUsers} from './api';
+import ButtonCenter from '../../../components/ButtonCenter';
 
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+const groupSchema = Yup.object().shape({
+    time: Yup.number().min(0).max(23.99, 'Hours Must be from 1-12 and Minutes 0-59').required(),
+    day: Yup.number().min(0).max(6).required(),
+    academicYear: Yup.number().min(1970).max(2500),
+    semester: Yup.number().min(1).max(2),
+    grade: Yup.number().min(1).max(3),
+    students: Yup.array().of(Yup.string()),
+    feesPerMonth: Yup.number().default(feesPerMonth),
+});
+
 class AddGroup extends React.Component {
     state = {
-        time: '',
-        day: '',
+        group: {
+            day: '0',
+            time: '',
+            academicYear: '',
+            semester: '1',
+            grade: '1',
+            students: [],
+            feesPerMonth: feesPerMonth,
+        },
         hours: '',
         minutes: '',
         dayTime: '1',
-        grade: '1',
-        academicYear: '',
-        semester: '',
-        students: [],
-        feesPerMonth: '',
+        allGradeStudents: [],
+        errors: {},
+        loading: false,
+
     };
-    _isMounted = false;
+    submitForm = async () => {
+        try {
+            let students = this.state.allGradeStudents.filter(student => {
+                return student.isSelected;
+            }).map(student => {
+                return student._id;
+            });
+            this.setState({group: {...this.state.group, students}});
+            await groupSchema.validate(this.state.group, {abortEarly: false});
+            await createGroup(this.state.group);
+            this.props.navigation.navigate('GroupsHome', {
+                shouldAddGroup: true,
+            });
+        } catch (e) {
+            let err = {};
+            if (typeof e.inner !== 'undefined') {
+                e.inner.forEach(error => {
+                    err[error.path] = error.errors[0];
+                });
+            } else {
+                err.network = e.message;
+            }
+            this.setState({errors: {...err}});
+        }
+    };
+
+    fetchGradeUsers = async (grade) => {
+        this.setState({loading: true});
+        try {
+            let students = await getGradeUsers(grade);
+            students = students.map(student => {
+                return {...student, isSelected: false};
+            });
+            this.setState({allGradeStudents: [...students]});
+        } catch (e) {
+            throw Error(e.message);
+        }
+    };
 
     async componentDidMount() {
-        this._isMounted = true;
         try {
-            let students = await getGradeUsers(this.state.grade);
-            if (this._isMounted) {
-                this.setState({students: [...students]});
-            }
+            await this.fetchGradeUsers(this.state.group.grade);
         } catch (e) {
-            alert(e);
+            this.setState(prevState => ({errors: {...prevState.errors, students: e.message}}));
+        } finally {
+            this.setState({loading: false});
         }
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
     }
 
     handleTimeSelection = () => {
@@ -47,24 +97,17 @@ class AddGroup extends React.Component {
             time = 0;
         }
         let hourFraction = Number(this.state.minutes / 60);
-        this.setState({time: (hourFraction + time).toString()});
+        this.setState(prevState => ({group: {...prevState.group, time: (hourFraction + time).toString()}}));
     };
 
     handleGradeChangeAndGetItsStudents = async (itemValue, itemIndex) => {
-        this.setState({grade: itemValue});
+        this.setState(prevState => ({group: {...prevState.group, grade: itemValue}}));
         try {
-            let students = await getGradeUsers(itemValue);
-            if (this._isMounted) {
-                this.setState({students: [...students]});
-            }
+            await this.fetchGradeUsers(itemValue);
         } catch (e) {
-            alert(e);
-        }
-    };
-
-    alertErrors = (errors) => {
-        if (errors.length) {
-            alert(errors[0]);
+            this.setState(prevState => ({errors: {...prevState.errors, students: e.message}}));
+        } finally {
+            this.setState({loading: false});
         }
     };
 
@@ -72,106 +115,150 @@ class AddGroup extends React.Component {
 
         return (
             <ScrollView style={{marginTop: 10, marginHorizontal: 5}}>
-                <KeyboardAvoidingView behavior="padding">
+                <KeyboardAvoidingView>
                     {/* WeekDay selection*/}
-                    <Text style={mainStyles.label}>Select A Day</Text>
-                    <Picker
-                        selectedValue={this.state.day}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setState({day: itemValue})
-                        }>
-                        {days.map((day, index) => (
-                            <Picker.Item label={day} value={index} key={index}/>
-                        ))}
-                    </Picker>
-
-                    {/* Time selection*/}
-                    <Text style={mainStyles.label}>Select Time</Text>
-                    <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
-                        <NumberInput style={{...mainStyles.textInput, flex: 1.7}}
-                                     keyboardType="number-pad"
-                                     placeholder="Hour from 0 to 12"
-                                     maxLength={2}
-                                     name={'Hours'}
-                                     min={1}
-                                     max={12}
-                                     value={this.state.hours}
-                                     onChangeText={(hours, errors) => {
-                                         this.alertErrors(errors, 'hours');
-                                         this.setState({hours: errors.length ? '' : hours});
-                                         setImmediate(this.handleTimeSelection);
-                                     }}
-                        />
-                        <NumberInput style={{...mainStyles.textInput, marginLeft: 5, flex: 2}}
-                                     keyboardType="number-pad"
-                                     placeholder="Minutes from 0 to 59"
-                                     maxLength={2}
-                                     name={'Minutes'}
-                                     min={0}
-                                     max={59}
-                                     value={this.state.minutes}
-                                     onChangeText={(minutes, errors) => {
-                                         this.alertErrors(errors);
-                                         this.setState({minutes: errors.length ? '' : minutes});
-                                         setImmediate(this.handleTimeSelection);
-                                     }}
-                        />
-                        <Picker style={{flex: 1}}
-                                selectedValue={this.state.dayTime}
-                                onValueChange={(itemValue, itemIndex) => {
-                                    this.setState({dayTime: itemValue});
-                                    setImmediate(this.handleTimeSelection);
-                                }}
+                    <View style={mainStyles.textInputWrapper}>
+                        <Text style={mainStyles.label}>Select A Day</Text>
+                        <Picker
+                            selectedValue={this.state.group.day}
+                            onValueChange={((itemValue, itemPosition) => {
+                                this.setState(prevState => ({group: {...prevState.group, day: itemValue}}));
+                            })}
                         >
-                            <Picker.Item label="PM" value={1}/>
-                            <Picker.Item label="AM" value={0}/>
+                            {days.map((day, index) => (
+                                <Picker.Item label={day} value={index} key={index}/>
+                            ))}
                         </Picker>
                     </View>
 
-                    {/* Academic Field*/}
-                    <Text style={mainStyles.label}>Academic Year</Text>
-                    <TextInput
-                        style={mainStyles.textInput}
-                        placeholder={'Academic Year'}
-                        keyboardType="number-pad"
-                        onChangeText={(val) => {
-                            this.setState({academicYear: val});
-                        }}
-                        maxLength={4}
-                    />
+                    {/* Time selection*/}
+                    <View style={mainStyles.textInputWrapper}>
+                        <Text style={mainStyles.label}>Select Time</Text>
+                        <View style={{justifyContent: 'space-between', flexDirection: 'row'}}>
+                            <TextInput
+                                style={{...mainStyles.textInput, flex: 1}}
+                                keyboardType="number-pad"
+                                placeholder="Hour(1-12)"
+                                maxLength={2}
+                                value={this.state.hours}
+                                onChangeText={(hours) => {
+                                    this.setState({hours});
+                                    setImmediate(this.handleTimeSelection);
+                                }}
+                            />
+                            <TextInput
+                                style={{...mainStyles.textInput, marginLeft: 5, flex: 1}}
+                                keyboardType="number-pad"
+                                placeholder="Minutes(0-59)"
+                                maxLength={2}
+                                value={this.state.minutes}
+                                onChangeText={(minutes) => {
+                                    this.setState({minutes});
+                                    setImmediate(this.handleTimeSelection);
+
+                                }}
+                            />
+                            <Picker style={{flex: 0.7}}
+                                    selectedValue={this.state.dayTime}
+                                    onValueChange={(dayTime) => {
+                                        this.setState({dayTime});
+                                        setImmediate(this.handleTimeSelection);
+                                    }}
+                            >
+                                <Picker.Item label="PM" value={1}/>
+                                <Picker.Item label="AM" value={0}/>
+                            </Picker>
+                        </View>
+                        {this.state.errors.time && (
+                            <Text style={mainStyles.error}>{this.state.errors.time}</Text>
+                        )}
+                    </View>
+
+                    {/* Academic Year Field*/}
+                    <View style={mainStyles.textInputWrapper}>
+                        <Text style={mainStyles.label}>Academic Year</Text>
+                        <TextInput
+                            style={mainStyles.textInput}
+                            placeholder={'Academic Year'}
+                            keyboardType="number-pad"
+                            maxLength={4}
+                            onChangeText={academicYear => {
+                                this.setState(prevState => ({group: {...prevState.group, academicYear}}));
+                            }}
+                        />
+                        {this.state.errors.academicYear && (
+                            <Text style={mainStyles.error}>{this.state.errors.academicYear}</Text>
+                        )}
+                    </View>
 
                     {/* Semester Field*/}
-                    <Text style={mainStyles.label}>Semester</Text>
-                    <Picker
-                        selectedValue={this.state.semester}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setState({semester: itemValue})
-                        }>
-                        <Picker.Item label="First Term" value="1" key="1"/>
-                        <Picker.Item label="Second Term" value="2" key="2"/>
-                    </Picker>
+                    <View style={mainStyles.textInputWrapper}>
+                        <Text style={mainStyles.label}>Semester</Text>
+                        <Picker
+                            selectedValue={this.state.group.semester}
+                            onValueChange={((itemValue, itemPosition) => {
+                                this.setState(prevState => ({group: {...prevState.group, semester: itemValue}}));
+                            })}
+                        >
+                            <Picker.Item label="First Term" value="1" key="1"/>
+                            <Picker.Item label="Second Term" value="2" key="2"/>
+                        </Picker>
+                    </View>
 
                     {/* Grade Field*/}
-                    <Text style={mainStyles.label}>Grade</Text>
-                    <Picker
-                        selectedValue={this.state.grade}
-                        onValueChange={(itemValue, itemIndex) => this.handleGradeChangeAndGetItsStudents(itemValue, itemIndex)}>
-                        <Picker.Item label="First Year" value="1" key="1"/>
-                        <Picker.Item label="Second Year" value="2" key="2"/>
-                        <Picker.Item label="Third Year" value="3" key="3"/>
-                    </Picker>
+                    <View style={mainStyles.textInputWrapper}>
+                        <Text style={mainStyles.label}>Grade</Text>
+                        <Picker
+                            selectedValue={this.state.group.grade}
+                            onValueChange={(itemValue, itemIndex) => (
+                                this.handleGradeChangeAndGetItsStudents(itemValue, itemIndex)
+                            )}>
+                            <Picker.Item label="First Year" value="1" key="1"/>
+                            <Picker.Item label="Second Year" value="2" key="2"/>
+                            <Picker.Item label="Third Year" value="3" key="3"/>
+                        </Picker>
+                    </View>
 
-                    {/* Academic Field*/}
-                    <Text style={mainStyles.label}>Students</Text>
-                    {(!this.state.students.length) ? (
-                            <View style={mainStyles.center}>
-                                <Text>No Students</Text>
-                            </View>) :
-                        (
-                            this.state.students.map((student, index) => (
-                                <Text key={index}>{student.name}</Text>
-                            ))
+                    {/* Students Field*/}
+                    <View style={mainStyles.textInputWrapper}>
+                        <Text style={mainStyles.label}>Students</Text>
+                        {(this.state.loading) ? (<Text>Loading...</Text>) : (this.state.errors.students) ? (
+                            <Text style={mainStyles.error}>{this.state.errors.students}</Text>
+                        ) : (!this.state.allGradeStudents.length) ? (
+                                <View style={mainStyles.center}>
+                                    <Text>No Students</Text>
+                                </View>) :
+                            (
+                                this.state.allGradeStudents.map((student, index) => (
+                                    <View key={index} style={mainStyles.mt5}>
+                                        <CheckBox
+                                            key={index}
+                                            checkedColor={mainColorTheme}
+                                            onPress={() => {
+                                                let students = [...this.state.allGradeStudents];
+                                                students[index].isSelected = !students[index].isSelected;
+                                                this.setState({allGradeStudents: students});
+                                            }}
+                                            checked={student.isSelected}
+                                            title={student.name}
+                                        />
+                                    </View>
+                                ))
+                            )}
+                    </View>
+
+                    <View style={{...mainStyles.textInputWrapper, ...mainStyles.mt20, marginBottom: 10}}>
+                        {this.state.errors.network && (
+                            <View style={mainStyles.mb5}>
+                                <Text style={mainStyles.error}>{this.state.errors.network}</Text>
+                            </View>
                         )}
+                        <ButtonCenter
+                            onPress={()=>{ this.submitForm() }}
+                            title="Add"
+                            iconName="plus"
+                        />
+                    </View>
                 </KeyboardAvoidingView>
             </ScrollView>
         );

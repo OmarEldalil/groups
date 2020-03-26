@@ -36,6 +36,7 @@ target 'rn_classes' do
 
 
 
+
   target 'rn_classesTests' do
     inherit! :search_paths
     # Pods for testing

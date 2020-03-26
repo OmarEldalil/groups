@@ -1,5 +1,6 @@
 {
   "name": "rn_classes",
   "displayName": "rn_classes",
-  "backendIp": "http://192.168.1.3:3000"
+  "backendIp": "http://192.168.137.1:3000",
+  "feesPerMonth" : 100
 }

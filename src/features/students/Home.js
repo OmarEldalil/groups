@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, TouchableHighlight, View} from 'react-native';
+import {ScrollView, Text, TouchableHighlight, View} from 'react-native';
 import {getStudents} from './api';
 import mainStyles from '../../../util/mainStyles';
 
@@ -11,7 +11,7 @@ export default class StudentsHome extends React.Component {
         students: [],
     };
 
-    async componentDidMount() {
+    fetchStudents = async () => {
         this.setState({loading: true});
         try {
             let students = await getStudents();
@@ -21,6 +21,17 @@ export default class StudentsHome extends React.Component {
         } finally {
             this.setState({loading: false});
         }
+    };
+
+    async componentDidMount() {
+        this.fetchStudents();
+        this.props.navigation.addListener('focus', (event) => {
+            let params = this.props.route.params;
+            if (typeof params !== 'undefined' && params.shouldAddStudent) {
+                this.fetchStudents();
+                params.shouldAddStudent = false;
+            }
+        });
     }
 
     render() {
@@ -40,7 +51,7 @@ export default class StudentsHome extends React.Component {
                 <Text>No Students Yet.</Text>
             </View>
         ) : (
-            <View>
+            <ScrollView>
                 {(this.state.students.map((student, index) => (
                     <TouchableHighlight
                         onPress={() => {
@@ -54,7 +65,7 @@ export default class StudentsHome extends React.Component {
                         </View>
                     </TouchableHighlight>
                 )))}
-            </View>
+            </ScrollView>
         );
     }
 }
