@@ -2,11 +2,12 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
 import StudentsHome from './Home';
-import StudentDetail from './Details';
+import StudentDetails from './Details';
 import {TouchableHighlight} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import mainStyles from '../../../util/mainStyles';
 import AddStudent from './AddStudent';
+import PaymentDetails from './PaymentDetail';
 
 
 const StudentsStack = createStackNavigator();
@@ -34,8 +35,8 @@ const StudentsTab = () => {
                 })}
             />
             <StudentsStack.Screen
-                name="StudentDetail"
-                component={StudentDetail}
+                name="StudentDetails"
+                component={StudentDetails}
                 options={({route}) => ({
                     title: route.params.student.name,
                 })}
@@ -46,6 +47,13 @@ const StudentsTab = () => {
                 component={AddStudent}
                 options={(route) => ({
                     title: 'Add Student',
+                })}
+            />
+            <StudentsStack.Screen
+                name="PaymentDetails"
+                component={PaymentDetails}
+                options={({route}) => ({
+                    title: (route.params.title && (new Date(route.params.title)).toDateString()) || 'Payment Details',
                 })}
             />
         </StudentsStack.Navigator>

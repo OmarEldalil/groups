@@ -4,7 +4,7 @@ import mainStyles from '../../../util/mainStyles';
 import {getUnpaidSessions, addPayment} from '../students/api';
 import {Input} from 'react-native-elements';
 import {feesPerMonth} from '../../../app.json';
-import Icon from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ButtonCenter from '../../../components/ButtonCenter';
 
 const AddPayment = (props) => {
@@ -42,6 +42,13 @@ const AddPayment = (props) => {
     }
 
     async function submit() {
+        if (amountError) {
+            return;
+        }
+        if (amount % (feesPerMonth / 4)) {
+            setAmountError('Amount You\'ve Entered Has A Fraction, It Must Only Covers Session\'s Fees.');
+            return;
+        }
         let data = {
             student: props.route.params.studentId,
             sessions: sessionsToBePaid,
@@ -50,12 +57,12 @@ const AddPayment = (props) => {
         };
         try {
             let payment = await addPayment(data);
-            props.navigation.navigate('GroupDetails',{
+            props.navigation.navigate('GroupDetails', {
                 shouldReload: true,
                 groupId: props.route.params.groupId,
                 title: props.route.params.title,
 
-            })
+            });
         } catch (e) {
             setAmountError(e.message);
         }
@@ -84,10 +91,10 @@ const AddPayment = (props) => {
             strikedSessionsView.push((
                 <View style={{...mainStyles.flexRow, alignItems: 'center'}} key={i}>
                     <Text style={{textDecorationLine: 'line-through', textDecorationStyle: 'solid'}}>
-                        {sessions[i].date}
+                        {(new Date(sessions[i].date)).toDateString()}
                     </Text>
                     <Icon
-                        name="checkcircle"
+                        name="check-circle"
                         color="green"
                         size={15}
                         style={mainStyles.ml10}
@@ -96,7 +103,7 @@ const AddPayment = (props) => {
             ));
         } else {
             strikedSessionsView.push((
-                <Text key={i}>{sessions[i].date}</Text>
+                <Text key={i}>{(new Date(sessions[i].date)).toDateString()}</Text>
             ));
         }
     }
@@ -125,8 +132,8 @@ const AddPayment = (props) => {
                 )}
                 <View style={mainStyles.mt20}>
                     <ButtonCenter
-                        title="Add"
-                        iconName="plus"
+                        title="Pay"
+                        iconName="cash"
                         onPress={submit}
                     />
                 </View>

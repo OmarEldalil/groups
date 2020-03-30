@@ -3,6 +3,11 @@ import {ScrollView, Text, TouchableHighlight, View} from 'react-native';
 import {getStudents} from './api';
 import mainStyles from '../../../util/mainStyles';
 
+const groupsGradeBackgroundColors = {
+    'First Year': '#f06292',
+    'Second Year': '#ffb300',
+    'Third Year': '#4dd0e1',
+};
 export default class StudentsHome extends React.Component {
 
     state = {
@@ -55,11 +60,11 @@ export default class StudentsHome extends React.Component {
                 {(this.state.students.map((student, index) => (
                     <TouchableHighlight
                         onPress={() => {
-                            this.props.navigation.navigate('StudentDetail', {student});
+                            this.props.navigation.navigate('StudentDetails', {student});
                         }}
                         key={index}
                     >
-                        <View style={mainStyles.card}>
+                        <View style={{...mainStyles.card, backgroundColor: groupsGradeBackgroundColors[student.grade]}}>
                             <Text style={mainStyles.bold}>{student.name}</Text>
                             <Text>{student.grade}</Text>
                         </View>

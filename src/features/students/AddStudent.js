@@ -23,6 +23,7 @@ class AddStudent extends React.Component {
             grade: '1',
             type: '1',
         },
+        error: '',
     };
 
     render() {
@@ -39,7 +40,7 @@ class AddStudent extends React.Component {
                                     shouldAddStudent: true,
                                 });
                             } catch (e) {
-                                console.log(e);
+                                this.setState({error: e.message});
                             }
                         }}
                     >
@@ -108,11 +109,21 @@ class AddStudent extends React.Component {
                                         <Text style={mainStyles.error}>{errors.grade}</Text>
                                     </View>) : <Text></Text>}
                                 </View>
-                                <ButtonCenter
-                                    onPress={handleSubmit}
-                                    title="Add"
-                                    iconName="plus"
-                                />
+                                <View style={mainStyles.mb5}>
+                                    {this.state.error ? (
+                                        <View
+                                            style={{alignItems: 'center', justifyContent: 'center', marginBottom: 10}}>
+                                            <Text style={{...mainStyles.error}}>
+                                                {this.state.error}
+                                            </Text>
+                                        </View>
+                                    ) : (<View></View>)}
+                                    <ButtonCenter
+                                        onPress={handleSubmit}
+                                        title="Add"
+                                        iconName="plus"
+                                    />
+                                </View>
                             </View>
                         )}
                     </Formik>

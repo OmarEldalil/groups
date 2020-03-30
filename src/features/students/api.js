@@ -21,7 +21,7 @@ export const createStudent = async (student) => {
         });
         return res.data;
     } catch (e) {
-        throw Error(e.message);
+        throw Error(e.response.data.errorMsg);
     }
 };
 
@@ -51,6 +51,17 @@ export const addPayment = async (data) => {
     try {
         let res =  await axios.post(`${backendIp}/users/addPayment`, {
             ...data,
+        });
+        return res.data;
+    } catch (e) {
+        throw Error(e.message);
+    }
+};
+
+export const getStudentPaymentDetails = async (paymentId) => {
+    try {
+        let res = await axios.get(`${backendIp}/users/payments/${paymentId}`, {
+            timeout: 2000,
         });
         return res.data;
     } catch (e) {

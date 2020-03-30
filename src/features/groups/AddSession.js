@@ -5,7 +5,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Yup from 'yup';
 import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
-import {addSessionToGroup} from './api';
+import {addSessionToGroup, getGradeUsers} from './api';
 import ButtonCenter from '../../../components/ButtonCenter';
 
 export default function AddSession(props) {
@@ -14,7 +14,7 @@ export default function AddSession(props) {
     const [students, setStudents] = useState(props.route.params.students);
     const [showDatePickerField, setShowDatePickerField] = useState(false);
     const [loading, setLoading] = useState(false);
-
+    const [moreStudents, setMoreStudents] = useState(false);
     const sessionSchema = Yup.object().shape({
         date: Yup.date().required(),
         attendees: Yup.array().of(Yup.string()),
@@ -42,6 +42,17 @@ export default function AddSession(props) {
             setError(e.message);
         } finally {
             setLoading(true);
+        }
+    };
+
+    const loadMoreStudents = async () => {
+        try {
+            let students = await getGradeUsers(props.route.params.gradeId);
+            setStudents(students);
+            setMoreStudents(true);
+
+        } catch (e) {
+            setError(e.message);
         }
     };
     return (
@@ -78,7 +89,7 @@ export default function AddSession(props) {
                             <Text>No Students Found.</Text>
                         </View>
                     ) :
-                    <ScrollView>
+                    <View>
                         {students.map((student, index) => (
                             <CheckBox
                                 key={index}
@@ -93,11 +104,19 @@ export default function AddSession(props) {
                                 }))}
                             />
                         ))}
-                    </ScrollView>
+                    </View>
                 }
                 {error ? (<View>
                     <Text style={mainStyles.error}>{error}</Text>
                 </View>) : (<Text></Text>)}
+                {!moreStudents && (<Button
+                    type="clear"
+                    title="Add Student From Another Group ?"
+                    titleStyle={{color: mainColorTheme, fontSize: 12}}
+                    onPress={() => {
+                        loadMoreStudents();
+                    }}
+                />)}
                 <ButtonCenter
                     title={'Add'}
                     iconName="plus"

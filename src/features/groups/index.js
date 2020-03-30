@@ -6,8 +6,9 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import GroupsHome from './Home';
 import GroupDetails from './Details';
 import AddSession from './AddSession';
+import SessionDetails from './SessionDetails';
 import AddGroup from './AddGroup';
-import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
+import mainStyles from '../../../util/mainStyles';
 import AddMoreStudents from './AddMoreStudents';
 import AddPayment from './AddPayment';
 
@@ -39,6 +40,7 @@ const GroupsTab = () => {
                     ),
                 })}
             />
+
             <GroupsStack.Screen
                 name="GroupDetails"
                 component={GroupDetails}
@@ -48,6 +50,7 @@ const GroupsTab = () => {
 
 
             />
+
             <GroupsStack.Screen
                 name="AddSession"
                 component={AddSession}
@@ -55,6 +58,15 @@ const GroupsTab = () => {
                     title: 'Add Session',
                 })}
             />
+
+            <GroupsStack.Screen
+                name="SessionDetails"
+                component={SessionDetails}
+                options={({route, navigation}) => ({
+                    title: "Session Details",
+                })}
+            />
+
             <GroupsStack.Screen
                 name="AddMoreStudents"
                 component={AddMoreStudents}
@@ -62,16 +74,19 @@ const GroupsTab = () => {
                     title: 'Add More Students',
                 })}
             />
+
             <GroupsStack.Screen
                 name="AddGroup"
                 component={AddGroup}
                 options={{title: 'Add New Group'}}
             />
+
             <GroupsStack.Screen
                 name="AddPayment"
                 component={AddPayment}
                 options={{title: 'Pay'}}
             />
+
         </GroupsStack.Navigator>
     );
 };

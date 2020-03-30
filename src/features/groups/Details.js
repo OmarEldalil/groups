@@ -1,8 +1,8 @@
 import React from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import {ScrollView, Text, TouchableHighlight, View} from 'react-native';
 import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
 import {getGroupDetails} from './api';
-import {Badge, Button, Icon} from 'react-native-elements';
+import {Badge, Button, Divider, Icon} from 'react-native-elements';
 
 export default class GroupDetail extends React.Component {
     state = {
@@ -88,7 +88,16 @@ export default class GroupDetail extends React.Component {
                                 }}
                             >
                                 <View style={mainStyles.flexRow}>
-                                    <Text style={{fontSize: 20}}>{student.name}</Text>
+                                    <TouchableHighlight
+                                        onPress={() => {
+                                            this.props.navigation.navigate('StudentDetails', {
+                                                student,
+                                                shouldUpdate: true,
+                                            });
+                                        }}
+                                    >
+                                        <Text style={{fontSize: 20}}>{student.name}</Text>
+                                    </TouchableHighlight>
                                 </View>
                                 {(student.totalUnpaidSessions) ? (
                                     <View style={mainStyles.flexRow}>
@@ -137,6 +146,7 @@ export default class GroupDetail extends React.Component {
                             onPress={() => {
                                 this.props.navigation.navigate('AddSession', {
                                     groupId: this.state.group._id,
+                                    gradeId: this.state.group.grade,
                                     title: this.props.route.params.title,
                                     students: this.state.group.students.map(student => ({...student, checked: false})),
                                 });
@@ -145,9 +155,23 @@ export default class GroupDetail extends React.Component {
                     </View>
                     {(this.state.group.sessions && this.state.group.sessions.length) ? (
                         this.state.group.sessions.map((session, index) => (
-                            <View key={index}>
-                                <Text>{(new Date(session.date)).toDateString()}</Text>
-                            </View>
+                            <TouchableHighlight
+                                key={index}
+                                style={{...mainStyles.flexRow, ...mainStyles.mb5}}
+                                onPress={() => {
+                                    this.props.navigation.navigate('SessionDetails', {
+                                        sessionId: session._id,
+                                    });
+                                }}
+                                underlayColor="#e5e5e5"
+                            >
+                                <View>
+                                    <View style={{...mainStyles.flexRow, paddingVertical: 5}}>
+                                        <Text>{`${(new Date(session.date)).toGMTString()}`}</Text>
+                                    </View>
+                                    <Divider/>
+                                </View>
+                            </TouchableHighlight>
                         ))
 
                     ) : (

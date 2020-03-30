@@ -2,13 +2,14 @@ import React from 'react';
 import {Text, View, TouchableHighlight, ScrollView, Linking} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
+import mainStyles, {mainColorTheme, mainUnderlayColor} from '../../../util/mainStyles';
 import {getStudentDetails} from './api';
+import {Badge, Divider} from 'react-native-elements';
 
 export default class StudentDetail extends React.Component {
     state = {
         error: '',
-        loading: false,
+        loading: true,
         student: {},
     };
 
@@ -47,7 +48,7 @@ export default class StudentDetail extends React.Component {
                 <Text>Loading...</Text>
             </View>
         ) : (
-            <View style={{padding: 5}}>
+            <ScrollView style={mainStyles.container}>
                 <View style={{borderBottomWidth: 1}}>
                     <Text style={mainStyles.label}>{this.state.student.name}</Text>
                     <Text style={{fontSize: 13, color: '#a5a5a5'}}>{this.state.student.grade}</Text>
@@ -68,7 +69,7 @@ export default class StudentDetail extends React.Component {
                         </View>
                     </TouchableHighlight>
                     <TouchableHighlight
-                        underlayColor={'#b9b9b9'}
+                        underlayColor={mainUnderlayColor}
                         onPress={() => {
                             Linking.openURL(`sms:${this.state.student.phone}`);
                         }}
@@ -84,19 +85,40 @@ export default class StudentDetail extends React.Component {
 
                 <View style={mainStyles.mt20}>
                     <Text style={{...mainStyles.heading2, color: mainColorTheme}}>Payment History</Text>
-                    <ScrollView style={mainStyles.mt20}>
+                    <View style={mainStyles.mt20}>
                         {this.state.student.payments && ((!this.state.student.payments.length) ? (
                             <View style={mainStyles.center}>
                                 <Text style={mainStyles.center}>No Payments Yet!</Text>
                             </View>
-                        ) : this.state.student.payments.map(payment => (
-                            <View style={mainStyles.flexRow}>
-                                <Text>{`${payment.date} | ${payment.amount}`}</Text>
-                            </View>
+                        ) : this.state.student.payments.map((payment, index) => (
+                            <TouchableHighlight
+                                key={index}
+                                style={{...mainStyles.flexRow, ...mainStyles.mb5}}
+                                onPress={() => {
+                                    this.props.navigation.navigate('PaymentDetails', {
+                                        title: payment.paymentDate,
+                                        paymentId: payment._id,
+                                    });
+                                }}
+                                underlayColor="#e5e5e5"
+                            >
+                                <View>
+                                    <View style={{...mainStyles.flexRow, paddingVertical: 5}}>
+                                        <Text>{`${(new Date(payment.paymentDate)).toDateString()}`}</Text>
+                                        <Badge status="primary" badgeStyle={{
+                                            backgroundColor: mainColorTheme,
+                                            padding: 5,
+                                            marginLeft: 10,
+                                        }}
+                                               value={payment.amount}/>
+                                    </View>
+                                    <Divider/>
+                                </View>
+                            </TouchableHighlight>
                         )))}
-                    </ScrollView>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
         ));
     }
 }

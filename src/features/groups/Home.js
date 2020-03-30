@@ -11,6 +11,12 @@ const styles = StyleSheet.create({
     },
 });
 
+const groupsGradeBackgroundColors = {
+    'First Year': '#f06292',
+    'Second Year': '#ffb300',
+    'Third Year': '#4dd0e1',
+};
+
 export default class GroupsHome extends React.Component {
     state = {
         loading: true,
@@ -73,7 +79,11 @@ export default class GroupsHome extends React.Component {
                 data={this.state.groups}
                 renderItem={({item, index, separator}) => (
                     <TouchableHighlight
-                        style={{...mainStyles.card, paddingHorizontal: 20}}
+                        style={{
+                            ...mainStyles.card,
+                            paddingHorizontal: 20,
+                            backgroundColor: groupsGradeBackgroundColors[item.grade],
+                        }}
                         onPress={() => this.getDetails({
                             title: `${item.day.name} ${item.time.forHumans}`,
                             group: item,

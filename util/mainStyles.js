@@ -2,6 +2,7 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 
 export const mainColorTheme = '#e91e63';
+export const mainUnderlayColor = '#b9b9b9';
 
 const mainStyles = StyleSheet.create({
     flex1: {
@@ -85,6 +86,10 @@ const mainStyles = StyleSheet.create({
     },
     flexRow: {
         flexDirection: 'row',
+    },
+    rowCenter: {
+        flexDirection: 'row',
+        alignItems:'center'
     },
     container: {
         marginTop: 5,
