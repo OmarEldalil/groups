@@ -2,7 +2,7 @@ import React from 'react';
 import {Text, View, StyleSheet, FlatList, TouchableHighlight} from 'react-native';
 
 import {getGroups} from './api';
-import mainStyles from '../../../util/mainStyles';
+import mainStyles, {groupsGradeBackgroundColors} from '../../../util/mainStyles';
 
 const styles = StyleSheet.create({
     title: {
@@ -10,12 +10,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 });
-
-const groupsGradeBackgroundColors = {
-    'First Year': '#f06292',
-    'Second Year': '#ffb300',
-    'Third Year': '#4dd0e1',
-};
 
 export default class GroupsHome extends React.Component {
     state = {

@@ -1,8 +1,11 @@
 import React from 'react';
 import {ScrollView, Text, TouchableHighlight, View} from 'react-native';
-import mainStyles, {mainColorTheme} from '../../../util/mainStyles';
+
+import {CommonActions} from '@react-navigation/native';
+import mainStyles, {mainColorTheme, mainUnderlayColor} from '../../../util/mainStyles';
 import {getGroupDetails} from './api';
 import {Badge, Button, Divider, Icon} from 'react-native-elements';
+
 
 export default class GroupDetail extends React.Component {
     state = {
@@ -89,11 +92,13 @@ export default class GroupDetail extends React.Component {
                             >
                                 <View style={mainStyles.flexRow}>
                                     <TouchableHighlight
+                                        underlayColor={mainUnderlayColor}
                                         onPress={() => {
                                             this.props.navigation.navigate('StudentDetails', {
                                                 student,
                                                 shouldUpdate: true,
                                             });
+
                                         }}
                                     >
                                         <Text style={{fontSize: 20}}>{student.name}</Text>

@@ -32,6 +32,12 @@ export default class StudentDetail extends React.Component {
         } else {
             this.setState({error: 'No Student Selected'});
         }
+        this.props.navigation.addListener('focus',async ()=>{
+            if(this.props.route.params.shouldUpdate){
+                this.props.route.params.shouldUpdate = false;
+                await this.fetchStudentDetail(this.props.route.params.student._id);
+            }
+        })
     }
 
     render() {

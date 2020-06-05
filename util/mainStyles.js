@@ -4,6 +4,15 @@ import {StyleSheet} from 'react-native';
 export const mainColorTheme = '#e91e63';
 export const mainUnderlayColor = '#b9b9b9';
 
+export const groupsGradeBackgroundColors = {
+    'First Year': '#f06292',
+    1: '#f06292',
+    'Second Year': '#ffb300',
+    2: '#ffb300',
+    'Third Year': '#4dd0e1',
+    3: '#4dd0e1',
+};
+
 const mainStyles = StyleSheet.create({
     flex1: {
         flex: 1,
@@ -21,6 +30,10 @@ const mainStyles = StyleSheet.create({
     rowSpaceAround: {
         flexDirection: 'row',
         justifyContent: 'space-around',
+    },
+    rowSpaceBetween: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
     },
     right: {
         flex: 1,
@@ -63,6 +76,7 @@ const mainStyles = StyleSheet.create({
     error: {
         color: 'red',
         paddingTop: 5,
+        textAlign: 'center',
     },
     heading2: {
         fontWeight: 'bold',
@@ -89,7 +103,7 @@ const mainStyles = StyleSheet.create({
     },
     rowCenter: {
         flexDirection: 'row',
-        alignItems:'center'
+        alignItems: 'center',
     },
     container: {
         marginTop: 5,

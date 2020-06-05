@@ -1,13 +1,8 @@
 import React from 'react';
 import {ScrollView, Text, TouchableHighlight, View} from 'react-native';
 import {getStudents} from './api';
-import mainStyles from '../../../util/mainStyles';
+import mainStyles, {groupsGradeBackgroundColors} from '../../../util/mainStyles';
 
-const groupsGradeBackgroundColors = {
-    'First Year': '#f06292',
-    'Second Year': '#ffb300',
-    'Third Year': '#4dd0e1',
-};
 export default class StudentsHome extends React.Component {
 
     state = {

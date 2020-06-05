@@ -1,19 +1,11 @@
 import React from 'react';
-import {Button, Text, View} from 'react-native';
-import {mainColorTheme} from '../../../util/mainStyles';
+import {View, Text} from 'react-native';
 
-export default class DashboardHome extends React.Component {
-    render() {
-        return (
-
-            <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                <Text>DashboardHome</Text>
-                <Button
-                    color={mainColorTheme}
-                    title="Go to Statistics"
-                    onPress={() => this.props.navigation.navigate('DashboardStats')}
-                />
-            </View>
-        );
-    }
-}
+const Dashboard = (props) => {
+    return (
+        <View>
+            <Text>Dashboard</Text>
+        </View>
+    );
+};
+export default Dashboard;

@@ -86,3 +86,14 @@ export const addMoreStudentsToGroup = async (data) => {
         throw Error(e.message);
     }
 };
+
+export const getSessionDetails = async (sessionId) => {
+    try {
+        let res = await axios.get(`${backendIp}/sessions/${sessionId}`, {
+            timeout: 2000,
+        });
+        return res.data;
+    } catch (e) {
+        throw Error(e.response.data.message);
+    }
+};

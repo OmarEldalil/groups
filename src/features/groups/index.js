@@ -11,6 +11,7 @@ import AddGroup from './AddGroup';
 import mainStyles from '../../../util/mainStyles';
 import AddMoreStudents from './AddMoreStudents';
 import AddPayment from './AddPayment';
+import StudentDetails from '../students/Details';
 
 const GroupsStack = createStackNavigator();
 
@@ -67,6 +68,13 @@ const GroupsTab = () => {
                 })}
             />
 
+            <GroupsStack.Screen
+                name="StudentDetails"
+                component={StudentDetails}
+                options={({route, navigation}) => ({
+                    title: route.params.student.name,
+                })}
+            />
             <GroupsStack.Screen
                 name="AddMoreStudents"
                 component={AddMoreStudents}

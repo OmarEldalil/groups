@@ -25,7 +25,7 @@ export default function AddSession(props) {
             let selectedStudents = students.filter(student => student.checked).map(student => ({student: student._id}));
             let session = {
                 date,
-                groupId: props.route.params.groupId,
+                group: props.route.params.groupId,
                 attendees: selectedStudents,
             };
             await sessionSchema.validate(session);

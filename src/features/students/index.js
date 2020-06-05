@@ -5,7 +5,8 @@ import StudentsHome from './Home';
 import StudentDetails from './Details';
 import {TouchableHighlight} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import mainStyles from '../../../util/mainStyles';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import mainStyles, {mainUnderlayColor} from '../../../util/mainStyles';
 import AddStudent from './AddStudent';
 import PaymentDetails from './PaymentDetail';
 
@@ -14,7 +15,9 @@ const StudentsStack = createStackNavigator();
 
 const StudentsTab = () => {
     return (
-        <StudentsStack.Navigator>
+        <StudentsStack.Navigator
+            initialRouteName="StudentsHome"
+        >
             <StudentsStack.Screen
                 name="StudentsHome"
                 component={StudentsHome}
@@ -37,7 +40,7 @@ const StudentsTab = () => {
             <StudentsStack.Screen
                 name="StudentDetails"
                 component={StudentDetails}
-                options={({route}) => ({
+                options={({route, navigation}) => ({
                     title: route.params.student.name,
                 })}
             />

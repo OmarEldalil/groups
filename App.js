@@ -16,14 +16,14 @@ class App extends React.Component {
         return (
             <NavigationContainer>
                 <TabNavigation.Navigator
-                    initialRouteName="groups"
+                    initialRouteName="Groups"
                     tabBarOptions={{
                         activeTintColor: '#e91e63',
                         activeBackgroundColor: '#f7f4f4',
                     }}
                 >
                     <TabNavigation.Screen
-                        name="dashboard"
+                        name="Dashboard"
                         component={DashboardTab}
                         options={{
                             tabBarLabel: 'Dashboard',
@@ -33,7 +33,7 @@ class App extends React.Component {
                         }}
                     />
                     <TabNavigation.Screen
-                        name="groups"
+                        name="Groups"
                         component={GroupsTab}
                         options={{
                             tabBarLabel: 'Groups',
@@ -43,7 +43,7 @@ class App extends React.Component {
                         }}
                     />
                     <TabNavigation.Screen
-                        name="students"
+                        name="Students"
                         component={StudentsTab}
                          options={{
                             tabBarLabel: 'Students',
@@ -53,7 +53,7 @@ class App extends React.Component {
                         }}
                     />
                     <TabNavigation.Screen
-                        name="messages"
+                        name="Messages"
                         component={MessagesTab}
                          options={{
                             tabBarLabel: 'Messages',
